@@ -4,17 +4,18 @@ from vex import *
 brain = Brain()
 controller = Controller()
 # drivebase
-right_drive_back = Motor(Ports.PORT1)
-#right_drive_middle = Motor(Ports.PORT2)
-right_drive_front = Motor(Ports.PORT3, True)
-left_drive_back = Motor(Ports.PORT8)
-#left_drive_middle = Motor(Ports.PORT9)
-left_drive_front = Motor(Ports.PORT10, True)
-left_drive_smart = MotorGroup(left_drive_back, left_drive_front)
-right_drive_smart = MotorGroup(right_drive_back, right_drive_front)
+right_drive_back = Motor(Ports.PORT20) #TODO fix, free spin
+right_drive_middle = Motor(Ports.PORT12)
+right_drive_front = Motor(Ports.PORT11)
+left_drive_back = Motor(Ports.PORT2, True) #dead
+left_drive_middle = Motor(Ports.PORT13, True) #TODO fix, spun freely
+left_drive_front = Motor(Ports.PORT1, True)
+left_drive_smart = MotorGroup(left_drive_back, left_drive_middle, left_drive_front)
+right_drive_smart = MotorGroup(right_drive_back, right_drive_middle, right_drive_front)
 drivetrain = MotorGroup(left_drive_smart, right_drive_smart)
 # intake/lift
 intake_motor = Motor(Ports.PORT18)
+intake_motor = Motor(Ports.PORT10, True)
 #extractor = DigitalOut(brain.three_wire_port.a)
 
 # DRIVE CODE
@@ -24,7 +25,7 @@ def drive():
         vals = getDriveInput() #  gets input as an array
         controller.screen.print("L:", vals[0], " R:", vals[1])
         left_drive_smart.spin(FORWARD,vals[0],PERCENT) #  spins left side of the drivebase
-        right_drive_smart.spin(REVERSE, vals[1], PERCENT) #  spins right side of the drivebase
+        right_drive_smart.spin(FORWARD, vals[1], PERCENT) #  spins right side of the drivebase
         sleep(10, MSEC)
 
 # process input from sticks 
@@ -67,5 +68,8 @@ def intake():
 def usercontrol():
     Thread(drive)
     Thread(intake)
+
+def autonomous():
+    
  
 comp = Competition(usercontrol, autonomous)
