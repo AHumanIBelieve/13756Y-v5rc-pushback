@@ -14,7 +14,6 @@ left_drive_smart = MotorGroup(left_drive_back, left_drive_middle, left_drive_fro
 right_drive_smart = MotorGroup(right_drive_back, right_drive_middle, right_drive_front)
 drivetrain = MotorGroup(left_drive_smart, right_drive_smart)
 # intake/lift
-intake_motor = Motor(Ports.PORT18)
 intake_motor = Motor(Ports.PORT10, True)
 #extractor = DigitalOut(brain.three_wire_port.a)
 
@@ -48,18 +47,14 @@ def getDriveInput():
 #         elif(controller.buttonB.pressing()):
 #             extractor.set(False)
 
-def autonomous():
-    controller.screen.print("brrrrrrrrr")
+
 # # INTAKE CODE
-intake_forward = False
-intake_reverse = False
 def intake():
-    global intake_forward, intake_reverse, intake_motor
     while(True):
         if(controller.buttonL2.pressing()): #checks if button is pressed
             intake_motor.spin(FORWARD, 100, PERCENT)
         elif(controller.buttonR2.pressing()):
-            intake_motor.spin(REVERSE, 100, PERCENT)
+            intake_motor.spin(REVERSE, 100, PERCENT)                              
         else:
             intake_motor.spin(FORWARD, 0, PERCENT)
         sleep(10, MSEC)
@@ -70,6 +65,18 @@ def usercontrol():
     Thread(intake)
 
 def autonomous():
-    
+    intake_motor.spin(FORWARD, 100, PERCENT)
+    left_drive_smart.spin(FORWARD, 50, PERCENT)
+    right_drive_smart.spin(FORWARD, 50, PERCENT)
+    wait(2, SECONDS)
+    left_drive_smart.spin(FORWARD, 0, PERCENT)
+    right_drive_smart.spin(FORWARD, 0, PERCENT)
+    right_drive_smart.spin_for(FORWARD, 2, SECONDS, 50, PERCENT)
+    left_drive_smart.spin(FORWARD, 50, PERCENT)
+    right_drive_smart.spin(FORWARD, 50, PERCENT)
+    wait(0.5, SECONDS)
+    left_drive_smart.spin(FORWARD, 0, PERCENT)
+    right_drive_smart.spin(FORWARD, 0, PERCENT)
+    intake_motor.spin(REVERSE, 100, PERCENT)
  
 comp = Competition(usercontrol, autonomous)
