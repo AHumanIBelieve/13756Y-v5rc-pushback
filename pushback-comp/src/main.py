@@ -65,18 +65,35 @@ def usercontrol():
     Thread(intake)
 
 def autonomous():
-    intake_motor.spin(FORWARD, 100, PERCENT)
-    left_drive_smart.spin(FORWARD, 50, PERCENT)
-    right_drive_smart.spin(FORWARD, 50, PERCENT)
-    wait(2, SECONDS)
-    left_drive_smart.spin(FORWARD, 0, PERCENT)
-    right_drive_smart.spin(FORWARD, 0, PERCENT)
-    right_drive_smart.spin_for(FORWARD, 2, SECONDS, 50, PERCENT)
-    left_drive_smart.spin(FORWARD, 50, PERCENT)
-    right_drive_smart.spin(FORWARD, 50, PERCENT)
-    wait(0.5, SECONDS)
-    left_drive_smart.spin(FORWARD, 0, PERCENT)
-    right_drive_smart.spin(FORWARD, 0, PERCENT)
-    intake_motor.spin(REVERSE, 100, PERCENT)
+    # Movementacros - no need to modify these
+    MD_FORWARD = 1
+    MD_LEFT = 2
+    MD_RIGHT = 3
+    MD_BACK= 4
+
+    # --- MODIFY FROM HERE --- each direction in the movements array should have a corresponding movement time in movementLengths, therefore both arrays should be the same size
+
+    movements = [MD_FORWARD, MD_BACK] # MD_FORWARD, MD_BACK, MD_LEFT, MD_RIGHT
+    movementLengths = [2500, 1000] # in ms
+    velocityPercent = 75.0 # does what it says on the tin
+
+    # --- TO HERE ---
+    for i in range(0, len(movements)):
+        if(movements[i] == MD_FORWARD):
+            left_drive_smart.spin(FORWARD, velocityPercent, PERCENT)
+            right_drive_smart.spin(FORWARD, velocityPercent, PERCENT)
+        if(movements[i] == MD_BACK):
+            left_drive_smart.spin(REVERSE, velocityPercent, PERCENT)
+            right_drive_smart.spin(REVERSE, velocityPercent, PERCENT)
+        if(movements[i] == MD_LEFT):
+            left_drive_smart.spin(REVERSE, 100 - velocityPercent, PERCENT)
+            right_drive_smart.spin(FORWARD, velocityPercent, PERCENT)
+        if(movements[i] == MD_RIGHT):
+            left_drive_smart.spin(FORWARD, velocityPercent, PERCENT)
+            right_drive_smart.spin(REVERSE, 100 - velocityPercent, PERCENT)
+        sleep(movementLengths[i], TimeUnits.MSEC)
+        left_drive_smart.stop()
+        right_drive_smart.stop()
+
  
 comp = Competition(usercontrol, autonomous)
