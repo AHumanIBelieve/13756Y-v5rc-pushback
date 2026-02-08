@@ -1,3 +1,11 @@
+# ---------------------------------------------------------------------------- #
+#                                                                              #
+# 	Module:       main.py                                                      #
+# 	Created:      2/8/2026, 7:54:21 AM                                         #
+# 	Description:  V5 project                                                   #
+#                                                                              #
+# ---------------------------------------------------------------------------- #
+
 # Library imports
 from vex import *
 
@@ -19,65 +27,6 @@ outtake_motor = Motor(None, True) # TODO set motor number
 
 extractor = DigitalOut(brain.three_wire_port.a)
 
-# DRIVE CODE
-def drive():
-    while(True):
-        controller.screen.clear_row(0)
-        vals = getDriveInput() #  gets input as an array
-        controller.screen.print("L:", vals[0], " R:", vals[1])
-        left_drive_smart.spin(FORWARD,vals[0],PERCENT) #  spins left side of the drivebase
-        right_drive_smart.spin(FORWARD, vals[1], PERCENT) #  spins right side of the drivebase
-        sleep(10, MSEC)
-
-# process input from sticks 
-def getDriveInput():
-    vals = [controller.axis3.value(), controller.axis2.value()] # axis3 gets left input, axis2 gets right input
-    for i in vals: # goes through the vals array, checks if -10<value<10, and if it is, sets it to 0
-        if(i > 0):
-            i = (2**(i*(math.log(100)/math.log(2))/127))
-        elif(i < 0):
-            i = i*-1
-            i = (2**(i*(math.log(100)/math.log(2))/127))
-            i = i *-1
-    return vals
-
-def extract():
-    extractor.set(False)
-    while True:
-        if(controller.buttonA.pressing()):
-            extractor.set(True)
-        elif(controller.buttonB.pressing()):
-            extractor.set(False)
-
-
-# # INTAKE CODE
-def intake():
-    while(True):
-        if(controller.buttonL2.pressing()): #checks if button is pressed
-            intake_motor.spin(FORWARD, 70, PERCENT)
-        elif(controller.buttonR2.pressing()):
-            intake_motor.spin(REVERSE, 70, PERCENT)                              
-        else:
-            intake_motor.spin(FORWARD, 0, PERCENT)
-        sleep(10, MSEC)
-    
-def outtake():
-    while(True):
-        if(controller.buttonL2.pressing()): #checks if button is pressed
-            outtake_motor.spin(FORWARD, 100, PERCENT)
-        elif(controller.buttonR2.pressing()):
-            outtake_motor.spin(REVERSE, 100, PERCENT)                              
-        else:
-            outtake_motor.spin(FORWARD, 0, PERCENT)
-        sleep(10, MSEC)
-
-# initialisation function for driver control. while loops will be within the functions.
-def usercontrol():
-    Thread(drive)
-    Thread(intake)
-    Thread(outtake)
-    Thread(extract)
-
 def autonomous():
     # Movement macros - no need to modify these
     MD_FORWARD = 1
@@ -93,9 +42,10 @@ def autonomous():
     MD_EXTRACTORDOWN = 13
     MD_EXTRACTUP = 14
     # --- MODIFY FROM HERE --- each direction in the movements array should have a corresponding movement time in movementLengths, therefore both arrays should be the same size
-
-    movements = [MD_EXTRACTORDOWN, MD_FORWARD] # MD_FORWARD, MD_BACK, MD_LEFT, MD_RIGHT
-    movementLengths = [1, 1500] # in ms
+    movements = [MD_STARTINLIFT]
+    movementLengths = [100]
+    #movements = [MD_EXTRACTUP, MD_STARTINLIFT, MD_FORWARD, MD_EXTRACTORDOWN, MD_FORWARD, MD_PAUSE, MD_BACK] # MD_FORWARD, MD_BACK, MD_LEFT, MD_RIGHT
+    #movementLengths = [1, 1, 1500, 1, 1500, 15000, 1500] # in ms
     velocityPercent = 75.0 # does what it says on the tin
     outVelocity = 100.0
     inVelocity = 70.0
@@ -130,8 +80,16 @@ def autonomous():
         sleep(movementLengths[i], TimeUnits.MSEC)
         left_drive_smart.stop()
         right_drive_smart.stop()
-    
 
+def user_control():
+    brain.screen.clear_screen()
+    brain.screen.print("driver control")
+    # place driver control in this while loop
+    while True:
+        wait(20, MSEC)
 
- 
-comp = Competition(usercontrol, autonomous)
+# create competition instance
+comp = Competition(user_control, autonomous)
+
+# actions to do when the program starts
+brain.screen.clear_screen()
