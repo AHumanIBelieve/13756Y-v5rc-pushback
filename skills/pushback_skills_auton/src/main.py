@@ -23,7 +23,7 @@ right_drive_smart = MotorGroup(right_drive_back, right_drive_middle, right_drive
 drivetrain = MotorGroup(left_drive_smart, right_drive_smart)
 # intake/lift
 intake_motor = Motor(Ports.PORT10, True)
-outtake_motor = Motor(None, True) # TODO set motor number
+outtake_motor = Motor(Ports.PORT12, True) # TODO set motor number
 
 extractor = DigitalOut(brain.three_wire_port.a)
 
